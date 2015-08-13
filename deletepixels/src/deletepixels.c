@@ -877,7 +877,7 @@ removeMaxValues(void *buf, void *newBuf, tsize_t bufSize, uint16 maxValue)
 
             removedCount++;
         }
-	else
+        else
         {
             /*
              * Double check that this is really a valid pixel. There are cases
@@ -886,20 +886,20 @@ removeMaxValues(void *buf, void *newBuf, tsize_t bufSize, uint16 maxValue)
              * the calculated max value.
              */
 
-            if((i + 1) < bufSize && tifPtr[i+1] >= maxValue)
+            if(!seenFirstValidPixel && (i + 1) < bufSize && tifPtr[i+1] >= maxValue)
             {
                 /* Treat the current pixel as invalid too */
                 newTifPtr[j] = 0;
                 removedCount++;
             }
-	    /* Otherwise we start removing any extra pixels if necessary */
+	        /* Otherwise we start removing any extra pixels if necessary */
             else if(shouldRemoveExtraPixels && numExtraPixelsRemoved < numExtraPixelsToRemove)
-	    {
+            {
                 newTifPtr[j] = 0;
                 numExtraPixelsRemoved++;
-	    }
-	    /* Otherwise, we're done removing pixels */
-	    else
+	        }
+	        /* Otherwise, we're done removing pixels */
+	        else
             {
                 newTifPtr[j] = tifPtr[i];
 
