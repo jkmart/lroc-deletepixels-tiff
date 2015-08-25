@@ -310,16 +310,16 @@ main(int argc, char* argv[])
                 outtiled = TRUE;
                 deftilewidth = atoi(optarg);
                 break;
-	    case 'e':	    /* number of extra pixels to delete */
-		shouldRemoveExtraPixels = TRUE;
-		numExtraPixelsToRemove = atoi(optarg);
-		break;
-	    case 'W':       /* custom maximum value bandwidth */
-		maxValueBandWidth = atoi(optarg);
-		break;
-	    case 'T':       /* custom max value deciding threshold */
-		maxValueThreshold = atoi(optarg);
-		break;
+	        case 'e':	    /* number of extra pixels to delete */
+		        shouldRemoveExtraPixels = TRUE;
+		        numExtraPixelsToRemove = atoi(optarg);
+		        break;
+           case 'W':       /* custom maximum value bandwidth */
+		        maxValueBandWidth = atoi(optarg);
+		        break;
+	        case 'T':       /* custom max value deciding threshold */
+		        maxValueThreshold = atoi(optarg);
+		        break;
             case 'B':
                 *mp++ = 'b'; *mp = '\0';
                 break;
@@ -332,12 +332,12 @@ main(int argc, char* argv[])
             case 'C':
                 *mp++ = 'c'; *mp = '\0';
                 break;
-	    case 'F':       /* brute force delete pixels */
-		bruteForceRemove = TRUE;
-		break;
-	    case 'E':	    /* remove extra pixels */
-		shouldRemoveExtraPixels = TRUE;
-		break;
+	        case 'F':       /* brute force delete pixels */
+		        bruteForceRemove = TRUE;
+		        break;
+	        case 'E':	    /* remove extra pixels */
+		        shouldRemoveExtraPixels = TRUE;
+		        break;
             case '?':
                 usage();
                 /*NOTREACHED*/
@@ -909,7 +909,17 @@ removeMaxValues(void *buf, void *newBuf, tsize_t bufSize, uint16 maxValue)
                  * band to get removed.
                  */
 
-                seenFirstValidPixel = TRUE;
+                if(!seenFirstValidPixel)
+                {
+                    /*
+                     * If there's a null pixel, there are rare cases where 
+                     * max valued pixels are past the null pixel(s).
+                     */
+                     if(tifPtr[i] > 0)
+                     {
+                         seenFirstValidPixel = TRUE;
+                     }
+                }
             }
         }
 
