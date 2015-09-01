@@ -115,6 +115,7 @@
 						 */
 
 #define OUTPUT_FILENAME_APPEND  "_clean"/* This is appended to the filename of the source file */
+#define DEFAULT_REMOVE_PIXELS   TRUE /* Default behavior is to remove white pixels */
 
 void computeHistogram(void *, tsize_t, unsigned long *);
 void findMaxValue(unsigned long *, uint16 *);
@@ -128,6 +129,8 @@ static  uint32 tilelength;
 static  uint8 isLeftImage = FALSE;
 static  uint8 bruteForceRemove = FALSE;
 static  uint8 shouldRemoveExtraPixels = FALSE;
+static  uint8 deletePixels = DEFAULT_REMOVE_PIXELS;
+
 static  size_t maxValueBandWidth = DEFAULT_MAX_VALUE_BAND_WIDTH;
 static  size_t maxValueThreshold = DEFAULT_MAX_VALUE_THRESHOLD;
 static  size_t numExtraPixelsToRemove = DEFAULT_EXTRA_PIXELS_TO_DELETE;
@@ -237,7 +240,7 @@ main(int argc, char* argv[])
 
     *mp++ = 'w';
     *mp = '\0';
-    while ((c = getopt(argc, argv, ",:b:c:f:l:o:z:p:r:w:e:W:T:aistBLMCFE")) != -1)
+    while ((c = getopt(argc, argv, ",:b:c:f:l:o:z:p:r:w:e:W:T:aistBLMCFED")) != -1)
         switch (c) {
             case ',':
                 if (optarg[0] != '=') usage();
@@ -338,6 +341,9 @@ main(int argc, char* argv[])
 	        case 'E':	    /* remove extra pixels */
 		        shouldRemoveExtraPixels = TRUE;
 		        break;
+            case 'D':      /* Debug: Do no delete pixels */
+                deletePixels = FALSE;
+                break;
             case '?':
                 usage();
                 /*NOTREACHED*/
@@ -526,6 +532,7 @@ char* stuff[] = {
 " -F        enable the brute force deletion of the width of the maximum valued band",
 " -W #      set the width of the maximum valued band (pixels) (default = "STR(DEFAULT_MAX_VALUE_BAND_WIDTH)")",
 " -T #      set the threshold for determining which pixel qualifies as a maximum valued pixel (default = "STR(DEFAULT_MAX_VALUE_THRESHOLD)")",
+" -D        Debug: Do not delete pixels, perform copy operation only",
 "",
 " -a        append to output instead of overwriting",
 " -o offset set initial directory offset",
@@ -848,6 +855,14 @@ removeMaxValues(void *buf, void *newBuf, tsize_t bufSize, uint16 maxValue)
         }
 
         i = i + direction;
+    }
+    /* Debug mode: Do not delete pixels, copy only 
+     * bruteForceRemove and removeExtraPixels both override
+     * this behavior.
+     */
+    if(!deletePixels)
+    {
+        seenFirstValidPixel = TRUE;
     }
 
     while(i < bufSize)
